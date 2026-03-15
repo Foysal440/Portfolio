@@ -1,0 +1,3294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abdullah Al Foysal | Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg: #0a0a0a;
+            --bg-secondary: #111;
+            --text: #fff;
+            --text-muted: #888;
+            --accent: #6366f1;
+            --accent-2: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Admin Panel */
+        #adminPanel {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 100000;
+            display: none;
+            overflow-y: auto;
+        }
+        
+        #adminPanel.active { display: block; }
+        
+        .admin-header {
+            background: #1a1a1a;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .admin-tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0 2rem;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+        
+        .admin-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .admin-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        
+        .admin-content {
+            display: none;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .admin-content.active { display: block; }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #aaa;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover { background: #5558e0; }
+        
+        .btn-secondary { background: #333; }
+        .btn-secondary:hover { background: #444; }
+        
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #dc2626; }
+        
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #059669; }
+        
+        .btn-warning { background: var(--warning); }
+        .btn-warning:hover { background: #d97706; }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .item-row {
+            background: #1a1a1a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #222;
+        }
+        
+        .item-info { flex: 1; }
+        .item-title { font-weight: 500; margin-bottom: 0.25rem; }
+        .item-subtitle { color: #666; font-size: 0.875rem; }
+        
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .image-preview {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            background: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+        
+        .hidden { display: none !important; }
+        
+        /* Portfolio Styles */
+        .portfolio-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-links a:hover { color: #fff; }
+        
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99,102,241,0.3);
+        }
+        
+        .section-hidden { display: none !important; }
+        
+        #adminToggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99999;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        
+        #adminToggle:hover { opacity: 1; }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(99,102,241,0.1);
+            border: 1px solid rgba(99,102,241,0.3);
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            color: var(--accent);
+        }
+        
+        .tag {
+            padding: 0.25rem 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 1rem;
+            font-size: 0.75rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        #loginScreen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 100001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loginScreen.hidden {
+            display: none;
+        }
+
+        .cert-filter.active {
+            background: var(--accent) !important;
+            color: #fff;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 1rem;
+            padding: 2rem;
+            z-index: 100002;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 100001;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            z-index: 100003;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        /* Blog Styles */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .blog-card {
+            background: #111;
+            border-radius: 1rem;
+            overflow: hidden;
+            border: 1px solid #222;
+            transition: transform 0.2s;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+        
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .blog-content {
+            padding: 1.5rem;
+        }
+        
+        .blog-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .blog-meta {
+            color: #666;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .blog-excerpt {
+            color: #888;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        
+        .blog-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .blog-tag {
+            padding: 0.25rem 0.75rem;
+            background: rgba(99,102,241,0.1);
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            color: var(--accent);
+        }
+        
+        .read-more {
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .read-more:hover {
+            text-decoration: underline;
+        }
+        
+        .blog-post-full {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .blog-post-full .blog-image {
+            height: 400px;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .blog-post-full .blog-content {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #ccc;
+        }
+        
+        .blog-post-full .blog-content p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .blog-post-full .blog-content h2 {
+            color: #fff;
+            margin: 2rem 0 1rem;
+        }
+        
+        .back-to-blog {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #888;
+            margin-bottom: 2rem;
+            cursor: pointer;
+        }
+        
+        .back-to-blog:hover {
+            color: #fff;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- ADMIN TOGGLE -->
+<button id="adminToggle" class="btn" onclick="toggleAdmin()">
+    <i class="fas fa-cog"></i> Admin
+</button>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="hidden">
+    <div style="width: 100%; max-width: 400px; padding: 2rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <i class="fas fa-lock" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Admin Access</h2>
+            <p style="color: #666;">Enter credentials to manage portfolio</p>
+        </div>
+        
+        <div style="background: #111; padding: 2rem; border-radius: 1rem; border: 1px solid #222;">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPass" placeholder="Enter your password">
+            </div>
+            <div id="loginError" style="color: #dc2626; margin-bottom: 1rem; font-size: 0.875rem; display: none;">
+                Invalid credentials
+            </div>
+            <button class="btn" style="width: 100%;" onclick="doLogin()">Login</button>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem;" onclick="hideAdmin()">Back to Portfolio</button>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODALS -->
+<div id="editModal" class="modal hidden">
+    <h3 id="modalTitle" style="margin-bottom: 1.5rem;">Edit Item</h3>
+    <div id="modalContent"></div>
+    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button class="btn btn-success" onclick="saveEdit()">Save Changes</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+<div id="modalOverlay" class="modal-overlay hidden" onclick="closeModal()"></div>
+
+<!-- BLOG POST VIEW MODAL -->
+<div id="blogPostModal" class="modal hidden" style="max-width: 800px;">
+    <div id="blogPostContent"></div>
+    <div style="margin-top: 2rem; text-align: right;">
+        <button class="btn btn-secondary" onclick="closeBlogPost()">Close</button>
+    </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminPanel">
+    <div class="admin-header">
+        <h2 style="font-size: 1.25rem;"><i class="fas fa-cog" style="color: var(--accent); margin-right: 0.5rem;"></i> Portfolio Manager</h2>
+        <button class="btn btn-secondary" onclick="doLogout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+    
+    <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchTab(event, 'profile')">Profile</button>
+        <button class="admin-tab" onclick="switchTab(event, 'appearance')">Appearance</button>
+        <button class="admin-tab" onclick="switchTab(event, 'sections')">Sections</button>
+        <button class="admin-tab" onclick="switchTab(event, 'blog')">Blog</button>
+        <button class="admin-tab" onclick="switchTab(event, 'experience')">Experience</button>
+        <button class="admin-tab" onclick="switchTab(event, 'publications')">Publications</button>
+        <button class="admin-tab" onclick="switchTab(event, 'certificates')">Certificates</button>
+        <button class="admin-tab" onclick="switchTab(event, 'skills')">Skills</button>
+        <button class="admin-tab" onclick="switchTab(event, 'projects')">Projects</button>
+        <button class="admin-tab" onclick="switchTab(event, 'education')">Education</button>
+        <button class="admin-tab" onclick="switchTab(event, 'awards')">Awards</button>
+        <button class="admin-tab" onclick="switchTab(event, 'testimonials')">Testimonials</button>
+        <button class="admin-tab" onclick="switchTab(event, 'data')">Backup</button>
+    </div>
+    
+    <!-- PROFILE TAB -->
+    <div id="tab-profile" class="admin-content active">
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">Profile Picture</div>
+                <img id="previewProfileImg" class="image-preview" src="" alt="No image" style="display: none;">
+                <div id="noProfileImg" style="padding: 3rem; text-align: center; background: #1a1a1a; border-radius: 0.5rem; margin-bottom: 1rem; color: #666;">
+                    <i class="fas fa-user" style="font-size: 3rem; margin-bottom: 0.5rem;"></i>
+                    <p>No image uploaded</p>
+                </div>
+                <input type="file" id="inputProfileImg" accept="image/*" onchange="previewProfileImage(this)">
+                <button class="btn btn-success" style="margin-top: 1rem;" onclick="saveProfileImage()">Save Image</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Basic Information</div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="inputName">
+                </div>
+                <div class="form-group">
+                    <label>Professional Title</label>
+                    <input type="text" id="inputTitle">
+                </div>
+                <div class="form-group">
+                    <label>Status Text</label>
+                    <input type="text" id="inputStatus">
+                </div>
+                <button class="btn btn-success" onclick="saveProfile()">Save Profile</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">About / Bio</div>
+            <div class="form-group">
+                <textarea id="inputBio" rows="5"></textarea>
+            </div>
+            <button class="btn btn-success" onclick="saveBio()">Save Bio</button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Contact Information</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="inputEmail">
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" id="inputPhone">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="inputLocation">
+                </div>
+                <div class="form-group">
+                    <label>Passport/ID</label>
+                    <input type="text" id="inputPassport">
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="saveContact()">Save Contact</button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Social Links</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>LinkedIn URL</label>
+                    <input type="text" id="inputLinkedIn">
+                </div>
+                <div class="form-group">
+                    <label>Google Scholar URL</label>
+                    <input type="text" id="inputScholar">
+                </div>
+                <div class="form-group">
+                    <label>GitHub URL</label>
+                    <input type="text" id="inputGitHub">
+                </div>
+                <div class="form-group">
+                    <label>Twitter/X URL</label>
+                    <input type="text" id="inputTwitter">
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="saveSocial()">Save Social Links</button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Statistics</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Publications Count</label>
+                    <input type="number" id="inputStatPubs">
+                </div>
+                <div class="form-group">
+                    <label>Citations Count</label>
+                    <input type="number" id="inputStatCitations">
+                </div>
+                <div class="form-group">
+                    <label>h-index</label>
+                    <input type="number" id="inputStatHIndex">
+                </div>
+                <div class="form-group">
+                    <label>Years Experience</label>
+                    <input type="number" id="inputStatYears">
+                </div>
+                <div class="form-group">
+                    <label>Countries</label>
+                    <input type="number" id="inputStatCountries">
+                </div>
+                <div class="form-group">
+                    <label>Projects Completed</label>
+                    <input type="number" id="inputStatProjects">
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="saveStats()">Save Statistics</button>
+        </div>
+    </div>
+    
+    <!-- APPEARANCE TAB -->
+    <div id="tab-appearance" class="admin-content">
+        <div class="card">
+            <div class="card-title">Color Scheme</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Primary Color</label>
+                    <input type="color" id="inputColorPrimary" style="height: 50px;">
+                </div>
+                <div class="form-group">
+                    <label>Secondary Color</label>
+                    <input type="color" id="inputColorSecondary" style="height: 50px;">
+                </div>
+                <div class="form-group">
+                    <label>Background Color</label>
+                    <input type="color" id="inputColorBg" style="height: 50px;">
+                </div>
+                <div class="form-group">
+                    <label>Text Color</label>
+                    <input type="color" id="inputColorText" style="height: 50px;">
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="saveColors()">Apply Colors</button>
+        </div>
+    </div>
+    
+    <!-- SECTIONS TAB -->
+    <div id="tab-sections" class="admin-content">
+        <div class="card">
+            <div class="card-title">Section Visibility</div>
+            <p style="color: #666; margin-bottom: 1rem;">Toggle sections on/off in your portfolio</p>
+            <div id="sectionsList" class="item-list"></div>
+            <button class="btn btn-success" style="margin-top: 1rem;" onclick="saveSections()">Save Section Settings</button>
+        </div>
+    </div>
+
+    <!-- BLOG TAB -->
+    <div id="tab-blog" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Blog Post</div>
+            <div class="form-group">
+                <label>Blog Title</label>
+                <input type="text" id="newBlogTitle">
+            </div>
+            <div class="form-group">
+                <label>Excerpt (Short Description)</label>
+                <textarea id="newBlogExcerpt" rows="2" placeholder="Brief summary of the post..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Full Content (HTML supported)</label>
+                <textarea id="newBlogContent" rows="6" placeholder="Write your blog post content here..."></textarea>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" id="newBlogAuthor" value="Abdullah Al Foysal">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" id="newBlogCategory" placeholder="e.g., AI, Research, Tech">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tags (comma separated)</label>
+                <input type="text" id="newBlogTags" placeholder="AI, Machine Learning, Healthcare">
+            </div>
+            <div class="form-group">
+                <label>Featured Image</label>
+                <input type="file" id="newBlogImage" accept="image/*" onchange="previewBlogImage(this)">
+                <img id="previewBlogImg" style="max-width: 200px; margin-top: 0.5rem; display: none; border-radius: 0.5rem;">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="newBlogPublished" checked> Published
+                </label>
+            </div>
+            <button class="btn" onclick="addBlogPost()">
+                <i class="fas fa-plus"></i> Add Blog Post
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Blog Posts</div>
+            <div id="blogList" class="item-list"></div>
+        </div>
+    </div>
+    
+    <!-- EXPERIENCE TAB -->
+    <div id="tab-experience" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Experience</div>
+            <div class="form-group">
+                <label>Job Title</label>
+                <input type="text" id="newExpTitle">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Company</label>
+                    <input type="text" id="newExpCompany">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="newExpLocation">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="text" id="newExpStart" placeholder="e.g., Jan 2023">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="text" id="newExpEnd" placeholder="e.g., Present">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="newExpDesc" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Tags (comma separated)</label>
+                <input type="text" id="newExpTags" placeholder="Python, AI, Machine Learning">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="newExpCurrent"> Current Position
+                </label>
+            </div>
+            <button class="btn" onclick="addExperience()">
+                <i class="fas fa-plus"></i> Add Experience
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Experience</div>
+            <div id="experienceList" class="item-list"></div>
+        </div>
+    </div>
+    
+    <!-- PUBLICATIONS TAB -->
+    <div id="tab-publications" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Publication</div>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="newPubTitle">
+            </div>
+            <div class="form-group">
+                <label>Authors</label>
+                <input type="text" id="newPubAuthors">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Journal/Conference</label>
+                    <input type="text" id="newPubJournal">
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="number" id="newPubYear" value="2025">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>DOI/URL</label>
+                <input type="text" id="newPubUrl" placeholder="https://doi.org/...">
+            </div>
+            <div class="form-group">
+                <label>Tags (comma separated)</label>
+                <input type="text" id="newPubTags" placeholder="CNN, Healthcare, AI">
+            </div>
+            <button class="btn" onclick="addPublication()">
+                <i class="fas fa-plus"></i> Add Publication
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Publications</div>
+            <div id="publicationsList" class="item-list"></div>
+        </div>
+    </div>
+    
+    <!-- CERTIFICATES TAB -->
+    <div id="tab-certificates" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Certificate</div>
+            <div class="form-group">
+                <label>Certificate Title</label>
+                <input type="text" id="newCertTitle">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Issuing Organization</label>
+                    <input type="text" id="newCertIssuer">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="newCertType">
+                        <option value="professional">Professional</option>
+                        <option value="academic">Academic</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="text" id="newCertDate" placeholder="e.g., June 2024">
+                </div>
+                <div class="form-group">
+                    <label>Grade/Score (optional)</label>
+                    <input type="text" id="newCertGrade" placeholder="e.g., 95%">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Verification ID</label>
+                <input type="text" id="newCertVerify" placeholder="Certificate ID">
+            </div>
+            <div class="form-group">
+                <label>Certificate Image</label>
+                <input type="file" id="newCertImg" accept="image/*" onchange="previewCertImage(this)">
+                <img id="previewCertImg" style="max-width: 200px; margin-top: 0.5rem; display: none; border-radius: 0.5rem;">
+            </div>
+            <button class="btn" onclick="addCertificate()">
+                <i class="fas fa-plus"></i> Add Certificate
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Certificates</div>
+            <div id="certificatesList" class="item-list"></div>
+        </div>
+    </div>
+    
+    <!-- SKILLS TAB -->
+    <div id="tab-skills" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Skill</div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Skill Name</label>
+                    <input type="text" id="newSkillName">
+                </div>
+                <div class="form-group">
+                    <label>Proficiency (0-100)</label>
+                    <input type="number" id="newSkillLevel" min="0" max="100" value="80">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="newSkillCategory">
+                    <option value="programming">Programming Languages</option>
+                    <option value="ai">AI & Machine Learning</option>
+                    <option value="tools">Tools & Platforms</option>
+                    <option value="soft">Soft Skills</option>
+                </select>
+            </div>
+            <button class="btn" onclick="addSkill()">
+                <i class="fas fa-plus"></i> Add Skill
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Skills</div>
+            <div id="skillsList" class="item-list"></div>
+        </div>
+    </div>
+
+    <!-- PROJECTS TAB -->
+    <div id="tab-projects" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Project</div>
+            <div class="form-group">
+                <label>Project Name</label>
+                <input type="text" id="newProjectName">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="newProjectDesc" rows="3"></textarea>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Technologies</label>
+                    <input type="text" id="newProjectTech" placeholder="Python, TensorFlow, React">
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="text" id="newProjectYear" placeholder="2025">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Project URL</label>
+                <input type="text" id="newProjectUrl" placeholder="https://...">
+            </div>
+            <button class="btn" onclick="addProject()">
+                <i class="fas fa-plus"></i> Add Project
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Projects</div>
+            <div id="projectsList" class="item-list"></div>
+        </div>
+    </div>
+
+    <!-- EDUCATION TAB -->
+    <div id="tab-education" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Education</div>
+            <div class="form-group">
+                <label>Degree</label>
+                <input type="text" id="newEduDegree">
+            </div>
+            <div class="form-group">
+                <label>Institution</label>
+                <input type="text" id="newEduInstitution">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Start Year</label>
+                    <input type="text" id="newEduStart" placeholder="2020">
+                </div>
+                <div class="form-group">
+                    <label>End Year</label>
+                    <input type="text" id="newEduEnd" placeholder="2024">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Grade/GPA</label>
+                <input type="text" id="newEduGrade" placeholder="3.8/4.0">
+            </div>
+            <button class="btn" onclick="addEducation()">
+                <i class="fas fa-plus"></i> Add Education
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Education</div>
+            <div id="educationList" class="item-list"></div>
+        </div>
+    </div>
+
+    <!-- AWARDS TAB -->
+    <div id="tab-awards" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Award</div>
+            <div class="form-group">
+                <label>Award Name</label>
+                <input type="text" id="newAwardName">
+            </div>
+            <div class="form-group">
+                <label>Organization</label>
+                <input type="text" id="newAwardOrg">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="text" id="newAwardYear" placeholder="2025">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="newAwardDesc" placeholder="Brief description">
+                </div>
+            </div>
+            <button class="btn" onclick="addAward()">
+                <i class="fas fa-plus"></i> Add Award
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Awards</div>
+            <div id="awardsList" class="item-list"></div>
+        </div>
+    </div>
+
+    <!-- TESTIMONIALS TAB -->
+    <div id="tab-testimonials" class="admin-content">
+        <div class="card">
+            <div class="card-title">Add New Testimonial</div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="newTestName">
+            </div>
+            <div class="form-group">
+                <label>Position/Title</label>
+                <input type="text" id="newTestPosition">
+            </div>
+            <div class="form-group">
+                <label>Company</label>
+                <input type="text" id="newTestCompany">
+            </div>
+            <div class="form-group">
+                <label>Testimonial Text</label>
+                <textarea id="newTestText" rows="3"></textarea>
+            </div>
+            <button class="btn" onclick="addTestimonial()">
+                <i class="fas fa-plus"></i> Add Testimonial
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Manage Testimonials</div>
+            <div id="testimonialsList" class="item-list"></div>
+        </div>
+    </div>
+    
+    <!-- DATA TAB -->
+    <div id="tab-data" class="admin-content">
+        <div class="card">
+            <div class="card-title">Export Data</div>
+            <p style="color: #666; margin-bottom: 1rem;">Download all your portfolio data as a backup</p>
+            <button class="btn" onclick="exportData()">
+                <i class="fas fa-download"></i> Download JSON Backup
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Import Data</div>
+            <p style="color: #666; margin-bottom: 1rem;">Restore from a previous backup (WARNING: This will overwrite current data)</p>
+            <input type="file" id="importFile" accept=".json" style="margin-bottom: 1rem;">
+            <button class="btn btn-secondary" onclick="importData()">
+                <i class="fas fa-upload"></i> Restore from Backup
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Change Password</div>
+            <p style="color: #666; margin-bottom: 1rem;">Update admin login password</p>
+            <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" id="currentPass">
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" id="newPass">
+            </div>
+            <div class="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" id="confirmPass">
+            </div>
+            <button class="btn btn-warning" onclick="changePassword()">
+                <i class="fas fa-key"></i> Change Password
+            </button>
+        </div>
+        
+        <div class="card" style="border-color: #dc2626;">
+            <div class="card-title" style="color: #dc2626;">Danger Zone</div>
+            <button class="btn btn-danger" onclick="resetAllData()">
+                <i class="fas fa-trash"></i> Reset Everything to Default
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- PORTFOLIO CONTENT -->
+<nav class="portfolio-nav">
+    <a href="#" style="font-size: 1.5rem; font-weight: bold; text-decoration: none;" onclick="scrollToTop(event)">
+        <span class="gradient-text">AAF</span>.
+    </a>
+    <div class="nav-links">
+        <a onclick="scrollToSection('about')">About</a>
+        <a onclick="scrollToSection('blog')">Blog</a>
+        <a onclick="scrollToSection('experience')">Experience</a>
+        <a onclick="scrollToSection('publications')">Publications</a>
+        <a onclick="scrollToSection('projects')">Projects</a>
+        <a onclick="scrollToSection('certificates')">Certificates</a>
+        <a onclick="scrollToSection('skills')">Skills</a>
+        <a onclick="scrollToSection('contact')">Contact</a>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section id="section-hero" class="hero">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+        <div>
+            <div class="badge" style="margin-bottom: 1.5rem;">
+                <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
+                <span id="display-status">Loading...</span>
+            </div>
+            
+            <h1 style="font-size: 4rem; font-weight: bold; line-height: 1.1; margin-bottom: 1.5rem;">
+                <span id="display-name">Abdullah Al Foysal</span>
+            </h1>
+            
+            <p id="display-title" style="font-size: 1.25rem; color: #888; margin-bottom: 2rem; line-height: 1.6;">
+                AI & Machine Learning Engineer
+            </p>
+            
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <a onclick="scrollToSection('contact')" class="btn" style="text-decoration: none; cursor: pointer;">
+                    <i class="fas fa-paper-plane"></i> Contact Me
+                </a>
+                <button class="btn btn-secondary" onclick="downloadCV()">
+                    <i class="fas fa-download"></i> Download CV
+                </button>
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; color: #666;">
+                <a id="link-linkedin" href="#" target="_blank" style="color: inherit; font-size: 1.5rem;"><i class="fab fa-linkedin"></i></a>
+                <a id="link-scholar" href="#" target="_blank" style="color: inherit; font-size: 1.5rem;"><i class="fas fa-graduation-cap"></i></a>
+                <a id="link-github" href="#" target="_blank" style="color: inherit; font-size: 1.5rem;"><i class="fab fa-github"></i></a>
+                <a id="link-twitter" href="#" target="_blank" style="color: inherit; font-size: 1.5rem;"><i class="fab fa-twitter"></i></a>
+                <a id="link-email" href="#" style="color: inherit; font-size: 1.5rem;"><i class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+        
+        <div style="position: relative;">
+            <div style="position: absolute; inset: 0; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 1.5rem; transform: rotate(6deg); opacity: 0.3; filter: blur(20px);"></div>
+            <img id="display-profile-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='%23222'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23666'%3ENo Image%3C/text%3E%3C/svg%3E" style="width: 100%; border-radius: 1.5rem; position: relative; z-index: 1; filter: grayscale(100%);">
+            
+            <div style="position: absolute; top: -1rem; right: -1rem; background: rgba(0,0,0,0.8); padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1); z-index: 2;">
+                <i class="fas fa-brain" style="color: var(--accent);"></i> <span id="badge-pubs">50</span>+ Publications
+            </div>
+            <div style="position: absolute; bottom: -1rem; left: -1rem; background: rgba(0,0,0,0.8); padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.1); z-index: 2;">
+                <i class="fas fa-award" style="color: #eab308;"></i> h-index: <span id="badge-hindex">8</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATS SECTION -->
+<section id="section-stats" style="padding: 3rem 0; border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);">
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 2rem; text-align: center;">
+        <div class="glass-card">
+            <div id="stat-pubs" style="font-size: 3rem; font-weight: bold; color: var(--accent);">50</div>
+            <div style="color: #666; font-size: 0.875rem; text-transform: uppercase;">Publications</div>
+        </div>
+        <div class="glass-card">
+            <div id="stat-citations" style="font-size: 3rem; font-weight: bold; color: var(--accent);">200</div>
+            <div style="color: #666; font-size: 0.875rem; text-transform: uppercase;">Citations</div>
+        </div>
+        <div class="glass-card">
+            <div id="stat-hindex" style="font-size: 3rem; font-weight: bold; color: var(--accent);">8</div>
+            <div style="color: #666; font-size: 0.875rem; text-transform: uppercase;">h-index</div>
+        </div>
+        <div class="glass-card">
+            <div id="stat-years" style="font-size: 3rem; font-weight: bold; color: var(--accent);">5</div>
+            <div style="color: #666; font-size: 0.875rem; text-transform: uppercase;">Years Exp</div>
+        </div>
+        <div class="glass-card">
+            <div id="stat-countries" style="font-size: 3rem; font-weight: bold; color: var(--accent);">3</div>
+            <div style="color: #666; font-size: 0.875rem; text-transform: uppercase;">Countries</div>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section id="section-about">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 2rem;">About Me</h2>
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 4rem;">
+        <div>
+            <div id="display-bio" style="color: #888; line-height: 1.8; font-size: 1.125rem;">
+                Loading...
+            </div>
+        </div>
+        <div>
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1rem; color: var(--accent);">Contact Info</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">Location</span>
+                        <span id="display-location">Loading...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">Passport</span>
+                        <span id="display-passport">Loading...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">Email</span>
+                        <span id="display-email" style="font-size: 0.875rem;">Loading...</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #666;">Phone</span>
+                        <span id="display-phone">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BLOG SECTION -->
+<section id="section-blog" style="background: rgba(255,255,255,0.02);">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Latest Blog Posts</h2>
+    <div id="blogView">
+        <div id="blogGrid" class="blog-grid"></div>
+    </div>
+</section>
+
+<!-- EXPERIENCE SECTION -->
+<section id="section-experience" style="background: rgba(255,255,255,0.02);">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Work Experience</h2>
+    <div id="container-experience" style="display: flex; flex-direction: column; gap: 1.5rem;"></div>
+</section>
+
+<!-- PUBLICATIONS SECTION -->
+<section id="section-publications">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Publications</h2>
+    <div id="container-publications" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;"></div>
+</section>
+
+<!-- PROJECTS SECTION -->
+<section id="section-projects" style="background: rgba(255,255,255,0.02);">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Projects</h2>
+    <div id="container-projects" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;"></div>
+</section>
+
+<!-- CERTIFICATES SECTION -->
+<section id="section-certificates" style="background: rgba(255,255,255,0.02);">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Certificates & Awards</h2>
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem;">
+        <button onclick="filterCerts('all')" class="cert-filter active" style="padding: 0.5rem 1.5rem; border-radius: 2rem; background: var(--accent); color: #fff; border: none; cursor: pointer;">All</button>
+        <button onclick="filterCerts('professional')" class="cert-filter" style="padding: 0.5rem 1.5rem; border-radius: 2rem; background: rgba(255,255,255,0.1); color: #fff; border: none; cursor: pointer;">Professional</button>
+        <button onclick="filterCerts('academic')" class="cert-filter" style="padding: 0.5rem 1.5rem; border-radius: 2rem; background: rgba(255,255,255,0.1); color: #fff; border: none; cursor: pointer;">Academic</button>
+    </div>
+    <div id="container-certificates" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;"></div>
+</section>
+
+<!-- SKILLS SECTION -->
+<section id="section-skills">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Technical Skills</h2>
+    <div id="container-skills" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 2rem;"></div>
+</section>
+
+<!-- EDUCATION SECTION -->
+<section id="section-education" style="background: rgba(255,255,255,0.02);">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Education</h2>
+    <div id="container-education" style="display: flex; flex-direction: column; gap: 1.5rem;"></div>
+</section>
+
+<!-- AWARDS SECTION -->
+<section id="section-awards">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Awards & Recognition</h2>
+    <div id="container-awards" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;"></div>
+</section>
+
+<!-- TESTIMONIALS SECTION -->
+<section id="section-testimonials" style="background: rgba(255,255,255,0.02);">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 3rem; text-align: center;">Testimonials</h2>
+    <div id="container-testimonials" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;"></div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section id="section-contact" style="background: rgba(255,255,255,0.02); text-align: center;">
+    <h2 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">Get In Touch</h2>
+    <p style="color: #666; margin-bottom: 2rem;">Let's collaborate on research or AI projects</p>
+    
+    <div style="max-width: 600px; margin: 0 auto;">
+        <form id="contactForm" onsubmit="sendEmail(event)" style="display: flex; flex-direction: column; gap: 1rem;">
+            <input type="text" name="from_name" placeholder="Your Name" required style="padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #fff;">
+            <input type="email" name="from_email" placeholder="Your Email" required style="padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #fff;">
+            <input type="text" name="subject" placeholder="Subject" required style="padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #fff;">
+            <textarea name="message" rows="4" placeholder="Your Message" required style="padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: #fff; resize: vertical;"></textarea>
+            <button type="submit" class="btn" style="width: 100%;">Send Message</button>
+        </form>
+    </div>
+    
+    <div style="margin-top: 3rem; display: flex; justify-content: center; gap: 3rem; color: #666;">
+        <div>
+            <i class="fas fa-envelope" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+            <span id="contact-email">niloyhasanfoysal440@gmail.com</span>
+        </div>
+        <div>
+            <i class="fas fa-phone" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+            <span id="contact-phone">+39 347 869 1679</span>
+        </div>
+        <div>
+            <i class="fas fa-map-marker-alt" style="color: var(--accent); margin-bottom: 0.5rem; display: block;"></i>
+            <span id="contact-location">Genoa, Italy</span>
+        </div>
+    </div>
+</section>
+
+<footer style="padding: 2rem; text-align: center; color: #666; border-top: 1px solid rgba(255,255,255,0.1);">
+    <p>&copy; 2025 <span id="footer-name">Abdullah Al Foysal</span>. Passport: <span id="footer-passport">A04032679</span></p>
+</footer>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+    // Initialize EmailJS
+    emailjs.init("mT8KR6pDmHESvTKSQ");
+    
+    // ==================== DEFAULT DATA ====================
+    const defaultData = {
+        profile: {
+            name: "Abdullah Al Foysal",
+            title: "AI & Machine Learning Engineer",
+            status: "Available for Research Opportunities",
+            bio: "Innovative and research-driven AI and Machine Learning Engineer with a strong computer engineering and psychology background. Passionate about leveraging AI to advance healthcare, particularly in neuropsychiatric research.\n\nCurrently at Casa Paganini - InfoMus, University of Genoa, focusing on computational modeling of human movement using the EyesWeb platform.",
+            image: null
+        },
+        contact: {
+            email: "niloyhasanfoysal440@gmail.com",
+            phone: "+39 347 869 1679",
+            location: "Genoa, Italy",
+            passport: "A04032679",
+            linkedin: "https://linkedin.com/in/abdullah-al-foysal1",
+            scholar: "https://scholar.google.com/citations?user=cQ_zolQAAAAJ",
+            github: "https://github.com/abdullahfoysal",
+            twitter: ""
+        },
+        stats: {
+            publications: 50,
+            citations: 200,
+            hIndex: 8,
+            years: 5,
+            countries: 3,
+            projects: 15
+        },
+        colors: {
+            primary: "#6366f1",
+            secondary: "#8b5cf6",
+            background: "#0a0a0a",
+            text: "#ffffff"
+        },
+        sections: [
+            { id: 'hero', name: 'Hero Section', visible: true },
+            { id: 'stats', name: 'Stats Bar', visible: true },
+            { id: 'about', name: 'About Me', visible: true },
+            { id: 'blog', name: 'Blog', visible: true },
+            { id: 'experience', name: 'Experience', visible: true },
+            { id: 'publications', name: 'Publications', visible: true },
+            { id: 'projects', name: 'Projects', visible: true },
+            { id: 'certificates', name: 'Certificates', visible: true },
+            { id: 'skills', name: 'Skills', visible: true },
+            { id: 'education', name: 'Education', visible: true },
+            { id: 'awards', name: 'Awards', visible: true },
+            { id: 'testimonials', name: 'Testimonials', visible: true },
+            { id: 'contact', name: 'Contact', visible: true }
+        ],
+        blog: [
+            {
+                id: 1,
+                title: "The Future of AI in Healthcare",
+                excerpt: "Exploring how artificial intelligence is revolutionizing medical diagnosis and patient care...",
+                content: "<h2>The Future of AI in Healthcare</h2><p>Artificial intelligence is transforming healthcare in unprecedented ways. From early disease detection to personalized treatment plans, AI algorithms are becoming indispensable tools for medical professionals.</p><p>In this post, I explore the latest advancements in medical AI, including deep learning models for medical imaging, natural language processing for clinical notes, and predictive analytics for patient outcomes.</p><h3>Key Areas of Impact</h3><p>1. Medical Imaging: AI models can now detect anomalies in X-rays, MRIs, and CT scans with accuracy matching or exceeding human radiologists.</p><p>2. Drug Discovery: Machine learning accelerates the drug development pipeline by predicting molecular interactions and identifying potential candidates.</p><p>3. Personalized Medicine: AI analyzes patient data to recommend tailored treatment plans based on genetic markers and lifestyle factors.</p>",
+                author: "Abdullah Al Foysal",
+                date: "2025-03-14",
+                category: "AI",
+                tags: ["AI", "Healthcare", "Machine Learning"],
+                image: null,
+                published: true
+            },
+            {
+                id: 2,
+                title: "Understanding Transformer Architecture",
+                excerpt: "A deep dive into the transformer model that powers modern language AI like GPT...",
+                content: "<h2>Understanding Transformer Architecture</h2><p>The transformer architecture has revolutionized natural language processing. Unlike traditional recurrent neural networks, transformers process all tokens in parallel using self-attention mechanisms.</p><p>This post explains the key components of transformer models: multi-head attention, positional encoding, and feed-forward networks.</p>",
+                author: "Abdullah Al Foysal",
+                date: "2025-03-10",
+                category: "Deep Learning",
+                tags: ["Transformers", "NLP", "Deep Learning"],
+                image: null,
+                published: true
+            }
+        ],
+        experience: [
+            {
+                id: 1,
+                title: "University Research Assistant",
+                company: "Casa Paganini - InfoMus, University of Genoa",
+                location: "Genoa, Italy",
+                startDate: "May 2025",
+                endDate: "Present",
+                current: true,
+                description: "Research on human movement computational modeling using EyesWeb platform. Developing algorithms for expressive gesture recognition and affective computing.",
+                tags: ["EyesWeb", "Movement Analysis", "Affective Computing"]
+            },
+            {
+                id: 2,
+                title: "ML Engineer & Researcher",
+                company: "Istituto di Psicopatologia, Rome",
+                location: "Rome, Italy",
+                startDate: "Feb 2024",
+                endDate: "Jan 2025",
+                current: false,
+                description: "Developed ML models for neuropsychiatric disorder diagnosis. Published 8 papers on AI in healthcare including ICU delirium prediction.",
+                tags: ["Python", "TensorFlow", "Healthcare AI"],
+                highlight: "8 Papers"
+            }
+        ],
+        publications: [
+            {
+                id: 1,
+                title: "AI-Driven Pneumonia Diagnosis Using Deep Learning",
+                authors: "Foysal, A. & Sultana, S.",
+                journal: "Open Access Library Journal",
+                year: 2025,
+                url: "",
+                tags: ["CNN", "Medical Imaging"]
+            }
+        ],
+        projects: [
+            {
+                id: 1,
+                name: "Personal Claim Healthcare Software",
+                description: "Automated health claims data exchange with major Italian insurance portals",
+                technologies: ["Python", "Django", "REST API"],
+                year: "2024",
+                url: ""
+            }
+        ],
+        certificates: [
+            {
+                id: 1,
+                title: "The Bits and Bytes of Computer Networking",
+                issuer: "Google (Coursera)",
+                date: "June 2, 2020",
+                year: "2020",
+                grade: "91.38%",
+                type: "professional",
+                verifyId: "DALZT7V5ZE4S",
+                image: null,
+                icon: "fa-network-wired"
+            }
+        ],
+        skills: [
+            { name: "Python", level: 95, category: "programming" },
+            { name: "TensorFlow", level: 90, category: "ai" },
+            { name: "Communication", level: 85, category: "soft" }
+        ],
+        education: [
+            {
+                id: 1,
+                degree: "Master's in Computer Engineering",
+                institution: "University of Genoa",
+                startYear: "2023",
+                endYear: "2025",
+                grade: "In Progress"
+            }
+        ],
+        awards: [
+            {
+                id: 1,
+                name: "Best Research Paper Award",
+                organization: "International Conference on AI in Healthcare",
+                year: "2024",
+                description: "For outstanding contribution to ICU delirium prediction"
+            }
+        ],
+        testimonials: [
+            {
+                id: 1,
+                name: "Dr. Renato de Filippis",
+                position: "Research Director",
+                company: "Istituto di Psicopatologia",
+                text: "Abdullah is an exceptional researcher with deep understanding of AI applications in healthcare."
+            }
+        ],
+        admin: {
+            email: "niloyhasanfoysal440@gmail.com",
+            password: "abdulla556"
+        }
+    };
+    
+    // ==================== DATA MANAGEMENT ====================
+    let appData = null;
+    let currentEditItem = null;
+    let currentEditType = null;
+    let tempImage = null;
+    
+    function loadData() {
+        const saved = localStorage.getItem('portfolioData_v4');
+        if (saved) {
+            try {
+                appData = JSON.parse(saved);
+                if (!appData.admin) appData.admin = { email: "niloyhasanfoysal440@gmail.com", password: "abdulla556" };
+                if (!appData.blog) appData.blog = [];
+            } catch {
+                appData = JSON.parse(JSON.stringify(defaultData));
+            }
+        } else {
+            appData = JSON.parse(JSON.stringify(defaultData));
+        }
+    }
+    
+    function saveData() {
+        localStorage.setItem('portfolioData_v4', JSON.stringify(appData));
+        renderPortfolio();
+        showToast('Changes saved successfully!');
+    }
+    
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // ==================== INITIALIZATION ====================
+    document.addEventListener('DOMContentLoaded', () => {
+        loadData();
+        renderPortfolio();
+        populateAdminFields();
+        document.getElementById('loginScreen').classList.add('hidden');
+    });
+    
+    // ==================== RENDER PORTFOLIO ====================
+    function renderPortfolio() {
+        // Profile
+        document.getElementById('display-name').textContent = appData.profile.name;
+        document.getElementById('display-status').textContent = appData.profile.status;
+        document.getElementById('display-title').textContent = appData.profile.title;
+        document.getElementById('display-bio').innerHTML = appData.profile.bio.replace(/\n/g, '<br><br>');
+        
+        if (appData.profile.image) {
+            document.getElementById('display-profile-img').src = appData.profile.image;
+        }
+        
+        // Contact
+        document.getElementById('display-location').textContent = appData.contact.location;
+        document.getElementById('display-passport').textContent = appData.contact.passport;
+        document.getElementById('display-email').textContent = appData.contact.email;
+        document.getElementById('display-phone').textContent = appData.contact.phone;
+        
+        // Social links
+        document.getElementById('link-linkedin').href = appData.contact.linkedin || '#';
+        document.getElementById('link-scholar').href = appData.contact.scholar || '#';
+        document.getElementById('link-github').href = appData.contact.github || '#';
+        document.getElementById('link-twitter').href = appData.contact.twitter || '#';
+        document.getElementById('link-email').href = 'mailto:' + appData.contact.email;
+        
+        // Stats
+        document.getElementById('stat-pubs').textContent = appData.stats.publications;
+        document.getElementById('stat-citations').textContent = appData.stats.citations;
+        document.getElementById('stat-hindex').textContent = appData.stats.hIndex;
+        document.getElementById('stat-years').textContent = appData.stats.years;
+        document.getElementById('stat-countries').textContent = appData.stats.countries;
+        document.getElementById('badge-pubs').textContent = appData.stats.publications;
+        document.getElementById('badge-hindex').textContent = appData.stats.hIndex;
+        
+        // Footer
+        document.getElementById('footer-name').textContent = appData.profile.name;
+        document.getElementById('footer-passport').textContent = appData.contact.passport;
+        
+        // Contact section
+        document.getElementById('contact-email').textContent = appData.contact.email;
+        document.getElementById('contact-phone').textContent = appData.contact.phone;
+        document.getElementById('contact-location').textContent = appData.contact.location;
+        
+        // Colors
+        document.documentElement.style.setProperty('--accent', appData.colors.primary);
+        document.documentElement.style.setProperty('--accent-2', appData.colors.secondary);
+        document.documentElement.style.setProperty('--bg', appData.colors.background);
+        
+        // Sections visibility
+        appData.sections.forEach(section => {
+            const el = document.getElementById('section-' + section.id);
+            if (el) {
+                if (!section.visible) {
+                    el.classList.add('section-hidden');
+                } else {
+                    el.classList.remove('section-hidden');
+                }
+            }
+        });
+        
+        // Render all sections
+        renderBlog();
+        renderExperience();
+        renderPublications();
+        renderProjects();
+        renderCertificates('all');
+        renderSkills();
+        renderEducation();
+        renderAwards();
+        renderTestimonials();
+    }
+    
+    function renderBlog() {
+        const grid = document.getElementById('blogGrid');
+        if (!grid) return;
+        
+        const publishedPosts = (appData.blog || []).filter(post => post.published);
+        
+        if (publishedPosts.length === 0) {
+            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #666; padding: 3rem;">No blog posts yet</div>';
+            return;
+        }
+        
+        grid.innerHTML = publishedPosts.map(post => `
+            <div class="blog-card">
+                ${post.image ? `<img src="${post.image}" class="blog-image" alt="${post.title}">` : ''}
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span><i class="far fa-calendar"></i> ${formatDate(post.date)}</span>
+                        <span><i class="far fa-folder"></i> ${post.category || 'Uncategorized'}</span>
+                    </div>
+                    <h3 class="blog-title">${post.title}</h3>
+                    <p class="blog-excerpt">${post.excerpt || post.content.substring(0, 150)}...</p>
+                    <div class="blog-tags">
+                        ${(post.tags || []).map(tag => `<span class="blog-tag">${tag}</span>`).join('')}
+                    </div>
+                    <span class="read-more" onclick="viewBlogPost(${post.id})">
+                        Read More <i class="fas fa-arrow-right"></i>
+                    </span>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+    
+    function viewBlogPost(id) {
+        const post = (appData.blog || []).find(p => p.id === id);
+        if (!post) return;
+        
+        const content = `
+            <div class="blog-post-full">
+                ${post.image ? `<img src="${post.image}" class="blog-image" alt="${post.title}">` : ''}
+                <div class="blog-meta">
+                    <span><i class="far fa-calendar"></i> ${formatDate(post.date)}</span>
+                    <span><i class="far fa-user"></i> ${post.author}</span>
+                    <span><i class="far fa-folder"></i> ${post.category || 'Uncategorized'}</span>
+                </div>
+                <h1 style="font-size: 2rem; margin: 1rem 0; color: #fff;">${post.title}</h1>
+                <div class="blog-tags">
+                    ${(post.tags || []).map(tag => `<span class="blog-tag">${tag}</span>`).join('')}
+                </div>
+                <div class="blog-content">
+                    ${post.content}
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('blogPostContent').innerHTML = content;
+        document.getElementById('blogPostModal').classList.remove('hidden');
+        document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+    
+    function closeBlogPost() {
+        document.getElementById('blogPostModal').classList.add('hidden');
+        document.getElementById('modalOverlay').classList.add('hidden');
+    }
+    
+    function renderExperience() {
+        const container = document.getElementById('container-experience');
+        if (!container) return;
+        
+        if (appData.experience.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 3rem;">No experience added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = appData.experience.map(job => `
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 0.25rem;">${job.title}</h3>
+                        <p style="color: var(--accent); font-weight: 500;">${job.company}</p>
+                        <p style="color: #666; font-size: 0.875rem;">${job.location} • ${job.startDate} - ${job.endDate}</p>
+                    </div>
+                    ${job.current ? `<span style="padding: 0.25rem 0.75rem; background: rgba(34, 197, 94, 0.2); color: #22c55e; border-radius: 1rem; font-size: 0.75rem;">Current</span>` : ''}
+                </div>
+                <p style="color: #888; margin-bottom: 1rem;">${job.description}</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    ${(job.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderPublications() {
+        const container = document.getElementById('container-publications');
+        if (!container) return;
+        
+        if (appData.publications.length === 0) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #666; padding: 3rem;">No publications added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = appData.publications.map(pub => `
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                    <span style="padding: 0.25rem 0.5rem; background: rgba(99, 102, 241, 0.2); color: var(--accent); border-radius: 0.25rem; font-size: 0.75rem;">${pub.year}</span>
+                </div>
+                <h3 style="font-weight: bold; margin-bottom: 0.5rem; line-height: 1.4;">${pub.title}</h3>
+                <p style="color: #888; font-size: 0.875rem; margin-bottom: 0.25rem;">${pub.authors}</p>
+                <p style="color: #666; font-size: 0.75rem; margin-bottom: 1rem;">${pub.journal}</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    ${(pub.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderProjects() {
+        const container = document.getElementById('container-projects');
+        if (!container) return;
+        
+        if ((appData.projects || []).length === 0) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #666; padding: 3rem;">No projects added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.projects || []).map(project => `
+            <div class="glass-card">
+                <h3 style="font-weight: bold; margin-bottom: 0.5rem;">${project.name}</h3>
+                <p style="color: var(--accent); font-size: 0.875rem; margin-bottom: 0.5rem;">${project.year}</p>
+                <p style="color: #888; margin-bottom: 1rem;">${project.description}</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    ${(project.technologies || []).map(tech => `<span class="tag">${tech}</span>`).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderCertificates(filter) {
+        const container = document.getElementById('container-certificates');
+        if (!container) return;
+        
+        const certs = filter === 'all' ? appData.certificates : appData.certificates.filter(c => c.type === filter);
+        
+        if (certs.length === 0) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #666; padding: 3rem;">No certificates added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = certs.map(cert => `
+            <div class="glass-card" style="overflow: hidden;">
+                ${cert.image ? `<img src="${cert.image}" style="width: 100%; height: 160px; object-fit: cover; margin: -1.5rem -1.5rem 1rem -1.5rem; width: calc(100% + 3rem);">` : `
+                <div style="height: 160px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: flex; align-items: center; justify-content: center; margin: -1.5rem -1.5rem 1rem -1.5rem;">
+                    <i class="fas ${cert.icon || 'fa-certificate'}" style="font-size: 3rem; color: rgba(255,255,255,0.3);"></i>
+                </div>
+                `}
+                <h3 style="font-weight: bold; margin-bottom: 0.5rem; font-size: 1rem;">${cert.title}</h3>
+                <p style="color: var(--accent); font-size: 0.875rem; margin-bottom: 0.25rem;">${cert.issuer}</p>
+                <p style="color: #666; font-size: 0.75rem;">${cert.date}</p>
+                ${cert.grade ? `<p style="color: #666; font-size: 0.75rem;">Grade: ${cert.grade}</p>` : ''}
+                ${cert.verifyId ? `<p style="color: #666; font-size: 0.75rem;">ID: ${cert.verifyId}</p>` : ''}
+            </div>
+        `).join('');
+    }
+    
+    function renderSkills() {
+        const container = document.getElementById('container-skills');
+        if (!container) return;
+        
+        const categories = {
+            programming: "Programming Languages",
+            ai: "AI & Machine Learning",
+            tools: "Tools & Platforms",
+            soft: "Soft Skills"
+        };
+        
+        let hasSkills = false;
+        const html = Object.entries(categories).map(([key, title]) => {
+            const skills = appData.skills.filter(s => s.category === key);
+            if (skills.length === 0) return '';
+            hasSkills = true;
+            return `
+                <div class="glass-card">
+                    <h3 style="margin-bottom: 1.5rem; color: var(--accent);">${title}</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        ${skills.map(skill => `
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                    <span>${skill.name}</span>
+                                    <span style="color: #666;">${skill.level}%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${skill.level}%;"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = hasSkills ? html : '<div style="grid-column: 1/-1; text-align: center; color: #666; padding: 3rem;">No skills added yet</div>';
+    }
+    
+    function renderEducation() {
+        const container = document.getElementById('container-education');
+        if (!container) return;
+        
+        if ((appData.education || []).length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 3rem;">No education added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.education || []).map(edu => `
+            <div class="glass-card">
+                <h3 style="font-weight: bold; margin-bottom: 0.25rem;">${edu.degree}</h3>
+                <p style="color: var(--accent); margin-bottom: 0.25rem;">${edu.institution}</p>
+                <p style="color: #666; font-size: 0.875rem;">${edu.startYear} - ${edu.endYear} | ${edu.grade}</p>
+            </div>
+        `).join('');
+    }
+    
+    function renderAwards() {
+        const container = document.getElementById('container-awards');
+        if (!container) return;
+        
+        if ((appData.awards || []).length === 0) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #666; padding: 3rem;">No awards added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.awards || []).map(award => `
+            <div class="glass-card">
+                <h3 style="font-weight: bold; margin-bottom: 0.25rem;">${award.name}</h3>
+                <p style="color: var(--accent); margin-bottom: 0.25rem;">${award.organization}</p>
+                <p style="color: #666; font-size: 0.875rem;">${award.year}</p>
+                <p style="color: #888; margin-top: 0.5rem;">${award.description}</p>
+            </div>
+        `).join('');
+    }
+    
+    function renderTestimonials() {
+        const container = document.getElementById('container-testimonials');
+        if (!container) return;
+        
+        if ((appData.testimonials || []).length === 0) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #666; padding: 3rem;">No testimonials added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.testimonials || []).map(test => `
+            <div class="glass-card">
+                <p style="color: #888; font-style: italic; margin-bottom: 1rem;">"${test.text}"</p>
+                <div>
+                    <p style="font-weight: bold;">${test.name}</p>
+                    <p style="color: var(--accent); font-size: 0.875rem;">${test.position}, ${test.company}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // ==================== ADMIN FUNCTIONS ====================
+    function toggleAdmin() {
+        document.getElementById('adminPanel').classList.add('active');
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPass').value = '';
+        populateAdminFields();
+    }
+    
+    function hideAdmin() {
+        document.getElementById('adminPanel').classList.remove('active');
+        document.getElementById('loginScreen').classList.add('hidden');
+    }
+    
+    function doLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPass').value;
+        
+        if (email === appData.admin.email && pass === appData.admin.password) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('loginError').style.display = 'none';
+            showToast('Login successful!');
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+    
+    function doLogout() {
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginPass').value = '';
+        hideAdmin();
+    }
+    
+    function changePassword() {
+        const current = document.getElementById('currentPass').value;
+        const newPass = document.getElementById('newPass').value;
+        const confirm = document.getElementById('confirmPass').value;
+        
+        if (current !== appData.admin.password) {
+            alert('Current password is incorrect');
+            return;
+        }
+        
+        if (newPass !== confirm) {
+            alert('New passwords do not match');
+            return;
+        }
+        
+        if (newPass.length < 6) {
+            alert('Password must be at least 6 characters');
+            return;
+        }
+        
+        appData.admin.password = newPass;
+        saveData();
+        alert('Password changed successfully!');
+        
+        document.getElementById('currentPass').value = '';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmPass').value = '';
+    }
+    
+    function switchTab(event, tabName) {
+        document.querySelectorAll('.admin-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.admin-tab').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('tab-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+        
+        // Refresh lists
+        if (tabName === 'sections') renderSectionsList();
+        if (tabName === 'blog') renderBlogList();
+        if (tabName === 'experience') renderExperienceList();
+        if (tabName === 'publications') renderPublicationsList();
+        if (tabName === 'projects') renderProjectsList();
+        if (tabName === 'certificates') renderCertificatesList();
+        if (tabName === 'skills') renderSkillsList();
+        if (tabName === 'education') renderEducationList();
+        if (tabName === 'awards') renderAwardsList();
+        if (tabName === 'testimonials') renderTestimonialsList();
+    }
+    
+    // ==================== SAVE FUNCTIONS ====================
+    function saveProfile() {
+        appData.profile.name = document.getElementById('inputName').value;
+        appData.profile.title = document.getElementById('inputTitle').value;
+        appData.profile.status = document.getElementById('inputStatus').value;
+        saveData();
+    }
+    
+    function saveBio() {
+        appData.profile.bio = document.getElementById('inputBio').value;
+        saveData();
+    }
+    
+    function saveContact() {
+        appData.contact.email = document.getElementById('inputEmail').value;
+        appData.contact.phone = document.getElementById('inputPhone').value;
+        appData.contact.location = document.getElementById('inputLocation').value;
+        appData.contact.passport = document.getElementById('inputPassport').value;
+        saveData();
+    }
+    
+    function saveSocial() {
+        appData.contact.linkedin = document.getElementById('inputLinkedIn').value;
+        appData.contact.scholar = document.getElementById('inputScholar').value;
+        appData.contact.github = document.getElementById('inputGitHub').value;
+        appData.contact.twitter = document.getElementById('inputTwitter').value;
+        saveData();
+    }
+    
+    function saveStats() {
+        appData.stats.publications = parseInt(document.getElementById('inputStatPubs').value) || 0;
+        appData.stats.citations = parseInt(document.getElementById('inputStatCitations').value) || 0;
+        appData.stats.hIndex = parseInt(document.getElementById('inputStatHIndex').value) || 0;
+        appData.stats.years = parseInt(document.getElementById('inputStatYears').value) || 0;
+        appData.stats.countries = parseInt(document.getElementById('inputStatCountries').value) || 0;
+        appData.stats.projects = parseInt(document.getElementById('inputStatProjects').value) || 0;
+        saveData();
+    }
+    
+    function saveColors() {
+        appData.colors.primary = document.getElementById('inputColorPrimary').value;
+        appData.colors.secondary = document.getElementById('inputColorSecondary').value;
+        appData.colors.background = document.getElementById('inputColorBg').value;
+        appData.colors.text = document.getElementById('inputColorText').value;
+        saveData();
+    }
+    
+    function saveSections() {
+        const checkboxes = document.querySelectorAll('#sectionsList input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            const section = appData.sections.find(s => s.id === cb.dataset.id);
+            if (section) section.visible = cb.checked;
+        });
+        saveData();
+    }
+    
+    function saveProfileImage() {
+        if (tempImage) {
+            appData.profile.image = tempImage;
+            tempImage = null;
+            saveData();
+            showToast('Profile image saved!');
+        }
+    }
+    
+    // ==================== LIST RENDERING ====================
+    function renderSectionsList() {
+        const container = document.getElementById('sectionsList');
+        container.innerHTML = appData.sections.map(section => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${section.name}</div>
+                </div>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" ${section.visible ? 'checked' : ''} data-id="${section.id}" style="width: 20px; height: 20px;">
+                    <span style="font-size: 0.875rem; color: #666;">${section.visible ? 'Visible' : 'Hidden'}</span>
+                </label>
+            </div>
+        `).join('');
+    }
+    
+    function renderBlogList() {
+        const container = document.getElementById('blogList');
+        if ((appData.blog || []).length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No blog posts yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.blog || []).map(post => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${post.title}</div>
+                    <div class="item-subtitle">${formatDate(post.date)} • ${post.published ? 'Published' : 'Draft'}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editBlogPost(${post.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteBlogPost(${post.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderExperienceList() {
+        const container = document.getElementById('experienceList');
+        if (appData.experience.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No experience added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = appData.experience.map(job => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${job.title}</div>
+                    <div class="item-subtitle">${job.company} • ${job.startDate} - ${job.endDate}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editExperience(${job.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteExperience(${job.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderPublicationsList() {
+        const container = document.getElementById('publicationsList');
+        if (appData.publications.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No publications added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = appData.publications.map(pub => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${pub.title.substring(0, 50)}${pub.title.length > 50 ? '...' : ''}</div>
+                    <div class="item-subtitle">${pub.year} • ${pub.journal}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editPublication(${pub.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deletePublication(${pub.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderProjectsList() {
+        const container = document.getElementById('projectsList');
+        if ((appData.projects || []).length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No projects added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.projects || []).map(project => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${project.name}</div>
+                    <div class="item-subtitle">${project.year}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editProject(${project.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteProject(${project.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderCertificatesList() {
+        const container = document.getElementById('certificatesList');
+        if (appData.certificates.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No certificates added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = appData.certificates.map(cert => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${cert.title}</div>
+                    <div class="item-subtitle">${cert.issuer} • ${cert.date}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editCertificate(${cert.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteCertificate(${cert.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderSkillsList() {
+        const container = document.getElementById('skillsList');
+        if (appData.skills.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No skills added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = appData.skills.map((skill, index) => `
+            <div class="item-row">
+                <div class="item-info" style="display: flex; align-items: center; gap: 1rem; flex: 1;">
+                    <span style="min-width: 100px;">${skill.name}</span>
+                    <div style="flex: 1; background: #333; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${skill.level}%; height: 100%; background: var(--accent);"></div>
+                    </div>
+                    <span style="min-width: 40px; text-align: right;">${skill.level}%</span>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editSkill(${index})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSkill(${index})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderEducationList() {
+        const container = document.getElementById('educationList');
+        if ((appData.education || []).length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No education added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.education || []).map(edu => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${edu.degree}</div>
+                    <div class="item-subtitle">${edu.institution} • ${edu.startYear}-${edu.endYear}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editEducation(${edu.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteEducation(${edu.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderAwardsList() {
+        const container = document.getElementById('awardsList');
+        if ((appData.awards || []).length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No awards added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.awards || []).map(award => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${award.name}</div>
+                    <div class="item-subtitle">${award.organization} • ${award.year}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editAward(${award.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteAward(${award.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function renderTestimonialsList() {
+        const container = document.getElementById('testimonialsList');
+        if ((appData.testimonials || []).length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 1rem;">No testimonials added yet</div>';
+            return;
+        }
+        
+        container.innerHTML = (appData.testimonials || []).map(test => `
+            <div class="item-row">
+                <div class="item-info">
+                    <div class="item-title">${test.name}</div>
+                    <div class="item-subtitle">${test.position} at ${test.company}</div>
+                </div>
+                <div class="item-actions">
+                    <button class="btn btn-secondary" onclick="editTestimonial(${test.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteTestimonial(${test.id})" style="padding: 0.5rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // ==================== ADD FUNCTIONS ====================
+    function previewProfileImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                tempImage = e.target.result;
+                document.getElementById('previewProfileImg').src = e.target.result;
+                document.getElementById('previewProfileImg').style.display = 'block';
+                document.getElementById('noProfileImg').style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    function previewBlogImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                tempImage = e.target.result;
+                document.getElementById('previewBlogImg').src = e.target.result;
+                document.getElementById('previewBlogImg').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    function previewCertImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                tempImage = e.target.result;
+                document.getElementById('previewCertImg').src = e.target.result;
+                document.getElementById('previewCertImg').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    
+    function addBlogPost() {
+        const newPost = {
+            id: Date.now(),
+            title: document.getElementById('newBlogTitle').value,
+            excerpt: document.getElementById('newBlogExcerpt').value,
+            content: document.getElementById('newBlogContent').value,
+            author: document.getElementById('newBlogAuthor').value || 'Abdullah Al Foysal',
+            date: new Date().toISOString().split('T')[0],
+            category: document.getElementById('newBlogCategory').value,
+            tags: document.getElementById('newBlogTags').value.split(',').map(t => t.trim()).filter(t => t),
+            image: tempImage,
+            published: document.getElementById('newBlogPublished').checked
+        };
+        
+        if (!newPost.title || !newPost.content) {
+            alert('Please enter title and content');
+            return;
+        }
+        
+        if (!appData.blog) appData.blog = [];
+        appData.blog.unshift(newPost);
+        saveData();
+        renderBlogList();
+        renderBlog();
+        
+        // Clear form
+        document.getElementById('newBlogTitle').value = '';
+        document.getElementById('newBlogExcerpt').value = '';
+        document.getElementById('newBlogContent').value = '';
+        document.getElementById('newBlogCategory').value = '';
+        document.getElementById('newBlogTags').value = '';
+        document.getElementById('previewBlogImg').style.display = 'none';
+        tempImage = null;
+        
+        showToast('Blog post added!');
+    }
+    
+    function editBlogPost(id) {
+        const post = appData.blog.find(p => p.id === id);
+        if (!post) return;
+        
+        currentEditItem = post;
+        currentEditType = 'blog';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="editTitle" value="${post.title.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Excerpt</label>
+                <textarea id="editExcerpt" rows="2">${(post.excerpt || '').replace(/"/g, '&quot;')}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Content</label>
+                <textarea id="editContent" rows="6">${post.content.replace(/"/g, '&quot;')}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <input type="text" id="editCategory" value="${post.category || ''}">
+            </div>
+            <div class="form-group">
+                <label>Tags (comma separated)</label>
+                <input type="text" id="editTags" value="${(post.tags || []).join(', ')}">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="editPublished" ${post.published ? 'checked' : ''}> Published
+                </label>
+            </div>
+        `;
+        
+        openModal('Edit Blog Post', modalContent);
+    }
+    
+    function deleteBlogPost(id) {
+        if (!confirm('Delete this blog post?')) return;
+        appData.blog = (appData.blog || []).filter(p => p.id !== id);
+        saveData();
+        renderBlogList();
+        renderBlog();
+    }
+    
+    function addExperience() {
+        const newJob = {
+            id: Date.now(),
+            title: document.getElementById('newExpTitle').value,
+            company: document.getElementById('newExpCompany').value,
+            location: document.getElementById('newExpLocation').value,
+            startDate: document.getElementById('newExpStart').value,
+            endDate: document.getElementById('newExpEnd').value,
+            current: document.getElementById('newExpCurrent').checked,
+            description: document.getElementById('newExpDesc').value,
+            tags: document.getElementById('newExpTags').value.split(',').map(t => t.trim()).filter(t => t)
+        };
+        
+        if (!newJob.title || !newJob.company) {
+            alert('Please enter title and company');
+            return;
+        }
+        
+        if (!newJob.endDate && !newJob.current) {
+            newJob.endDate = 'Present';
+        }
+        
+        appData.experience.unshift(newJob);
+        saveData();
+        renderExperienceList();
+        
+        // Clear form
+        document.getElementById('newExpTitle').value = '';
+        document.getElementById('newExpCompany').value = '';
+        document.getElementById('newExpLocation').value = '';
+        document.getElementById('newExpStart').value = '';
+        document.getElementById('newExpEnd').value = '';
+        document.getElementById('newExpDesc').value = '';
+        document.getElementById('newExpTags').value = '';
+        document.getElementById('newExpCurrent').checked = false;
+    }
+    
+    function editExperience(id) {
+        const item = appData.experience.find(e => e.id === id);
+        if (!item) return;
+        
+        currentEditItem = item;
+        currentEditType = 'experience';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Job Title</label>
+                <input type="text" id="editTitle" value="${item.title.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Company</label>
+                <input type="text" id="editCompany" value="${item.company.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="editLocation" value="${item.location.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="text" id="editStart" value="${item.startDate}">
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="text" id="editEnd" value="${item.endDate}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="editDesc" rows="3">${item.description.replace(/"/g, '&quot;')}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Tags (comma separated)</label>
+                <input type="text" id="editTags" value="${(item.tags || []).join(', ')}">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="editCurrent" ${item.current ? 'checked' : ''}> Current Position
+                </label>
+            </div>
+        `;
+        
+        openModal('Edit Experience', modalContent);
+    }
+    
+    function deleteExperience(id) {
+        if (!confirm('Delete this experience?')) return;
+        appData.experience = appData.experience.filter(e => e.id !== id);
+        saveData();
+        renderExperienceList();
+    }
+    
+    function addPublication() {
+        const newPub = {
+            id: Date.now(),
+            title: document.getElementById('newPubTitle').value,
+            authors: document.getElementById('newPubAuthors').value,
+            journal: document.getElementById('newPubJournal').value,
+            year: parseInt(document.getElementById('newPubYear').value) || new Date().getFullYear(),
+            url: document.getElementById('newPubUrl').value,
+            tags: document.getElementById('newPubTags').value.split(',').map(t => t.trim()).filter(t => t)
+        };
+        
+        if (!newPub.title) {
+            alert('Please enter title');
+            return;
+        }
+        
+        appData.publications.unshift(newPub);
+        saveData();
+        renderPublicationsList();
+        
+        document.getElementById('newPubTitle').value = '';
+        document.getElementById('newPubAuthors').value = '';
+        document.getElementById('newPubJournal').value = '';
+        document.getElementById('newPubUrl').value = '';
+        document.getElementById('newPubTags').value = '';
+    }
+    
+    function editPublication(id) {
+        const item = appData.publications.find(p => p.id === id);
+        if (!item) return;
+        
+        currentEditItem = item;
+        currentEditType = 'publication';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="editTitle" value="${item.title.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Authors</label>
+                <input type="text" id="editAuthors" value="${item.authors.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Journal/Conference</label>
+                <input type="text" id="editJournal" value="${item.journal.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Year</label>
+                <input type="number" id="editYear" value="${item.year}">
+            </div>
+            <div class="form-group">
+                <label>URL</label>
+                <input type="text" id="editUrl" value="${item.url || ''}">
+            </div>
+            <div class="form-group">
+                <label>Tags (comma separated)</label>
+                <input type="text" id="editTags" value="${(item.tags || []).join(', ')}">
+            </div>
+        `;
+        
+        openModal('Edit Publication', modalContent);
+    }
+    
+    function deletePublication(id) {
+        if (!confirm('Delete this publication?')) return;
+        appData.publications = appData.publications.filter(p => p.id !== id);
+        saveData();
+        renderPublicationsList();
+    }
+    
+    function addProject() {
+        const newProject = {
+            id: Date.now(),
+            name: document.getElementById('newProjectName').value,
+            description: document.getElementById('newProjectDesc').value,
+            technologies: document.getElementById('newProjectTech').value.split(',').map(t => t.trim()).filter(t => t),
+            year: document.getElementById('newProjectYear').value,
+            url: document.getElementById('newProjectUrl').value
+        };
+        
+        if (!newProject.name) {
+            alert('Please enter project name');
+            return;
+        }
+        
+        if (!appData.projects) appData.projects = [];
+        appData.projects.unshift(newProject);
+        saveData();
+        renderProjectsList();
+        
+        document.getElementById('newProjectName').value = '';
+        document.getElementById('newProjectDesc').value = '';
+        document.getElementById('newProjectTech').value = '';
+        document.getElementById('newProjectYear').value = '';
+        document.getElementById('newProjectUrl').value = '';
+    }
+    
+    function editProject(id) {
+        const item = appData.projects.find(p => p.id === id);
+        if (!item) return;
+        
+        currentEditItem = item;
+        currentEditType = 'project';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Project Name</label>
+                <input type="text" id="editName" value="${item.name.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="editDesc" rows="3">${item.description.replace(/"/g, '&quot;')}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Technologies</label>
+                <input type="text" id="editTech" value="${(item.technologies || []).join(', ')}">
+            </div>
+            <div class="form-group">
+                <label>Year</label>
+                <input type="text" id="editYear" value="${item.year}">
+            </div>
+            <div class="form-group">
+                <label>URL</label>
+                <input type="text" id="editUrl" value="${item.url || ''}">
+            </div>
+        `;
+        
+        openModal('Edit Project', modalContent);
+    }
+    
+    function deleteProject(id) {
+        if (!confirm('Delete this project?')) return;
+        appData.projects = (appData.projects || []).filter(p => p.id !== id);
+        saveData();
+        renderProjectsList();
+    }
+    
+    function addCertificate() {
+        const type = document.getElementById('newCertType').value;
+        const newCert = {
+            id: Date.now(),
+            title: document.getElementById('newCertTitle').value,
+            issuer: document.getElementById('newCertIssuer').value,
+            date: document.getElementById('newCertDate').value,
+            year: (document.getElementById('newCertDate').value || '').split(' ').pop() || new Date().getFullYear().toString(),
+            grade: document.getElementById('newCertGrade').value,
+            type: type,
+            verifyId: document.getElementById('newCertVerify').value,
+            image: tempImage,
+            icon: 'fa-certificate'
+        };
+        
+        if (!newCert.title || !newCert.issuer) {
+            alert('Please fill in title and issuer');
+            return;
+        }
+        
+        appData.certificates.unshift(newCert);
+        saveData();
+        renderCertificatesList();
+        
+        // Clear form
+        document.getElementById('newCertTitle').value = '';
+        document.getElementById('newCertIssuer').value = '';
+        document.getElementById('newCertDate').value = '';
+        document.getElementById('newCertGrade').value = '';
+        document.getElementById('newCertVerify').value = '';
+        document.getElementById('newCertImg').value = '';
+        document.getElementById('previewCertImg').style.display = 'none';
+        tempImage = null;
+    }
+    
+    function editCertificate(id) {
+        const item = appData.certificates.find(c => c.id === id);
+        if (!item) return;
+        
+        currentEditItem = item;
+        currentEditType = 'certificate';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Certificate Title</label>
+                <input type="text" id="editTitle" value="${item.title.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Issuing Organization</label>
+                <input type="text" id="editIssuer" value="${item.issuer.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="text" id="editDate" value="${item.date}">
+            </div>
+            <div class="form-group">
+                <label>Grade/Score</label>
+                <input type="text" id="editGrade" value="${item.grade || ''}">
+            </div>
+            <div class="form-group">
+                <label>Verification ID</label>
+                <input type="text" id="editVerify" value="${item.verifyId || ''}">
+            </div>
+            <div class="form-group">
+                <label>Type</label>
+                <select id="editType">
+                    <option value="professional" ${item.type === 'professional' ? 'selected' : ''}>Professional</option>
+                    <option value="academic" ${item.type === 'academic' ? 'selected' : ''}>Academic</option>
+                </select>
+            </div>
+        `;
+        
+        openModal('Edit Certificate', modalContent);
+    }
+    
+    function deleteCertificate(id) {
+        if (!confirm('Delete this certificate?')) return;
+        appData.certificates = appData.certificates.filter(c => c.id !== id);
+        saveData();
+        renderCertificatesList();
+    }
+    
+    function addSkill() {
+        const newSkill = {
+            name: document.getElementById('newSkillName').value,
+            level: parseInt(document.getElementById('newSkillLevel').value) || 80,
+            category: document.getElementById('newSkillCategory').value
+        };
+        
+        if (!newSkill.name) {
+            alert('Please enter skill name');
+            return;
+        }
+        
+        appData.skills.push(newSkill);
+        saveData();
+        renderSkillsList();
+        
+        document.getElementById('newSkillName').value = '';
+        document.getElementById('newSkillLevel').value = '80';
+    }
+    
+    function editSkill(index) {
+        const item = appData.skills[index];
+        if (!item) return;
+        
+        currentEditItem = { index, ...item };
+        currentEditType = 'skill';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Skill Name</label>
+                <input type="text" id="editName" value="${item.name}">
+            </div>
+            <div class="form-group">
+                <label>Proficiency (0-100)</label>
+                <input type="number" id="editLevel" min="0" max="100" value="${item.level}">
+            </div>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="editCategory">
+                    <option value="programming" ${item.category === 'programming' ? 'selected' : ''}>Programming Languages</option>
+                    <option value="ai" ${item.category === 'ai' ? 'selected' : ''}>AI & Machine Learning</option>
+                    <option value="tools" ${item.category === 'tools' ? 'selected' : ''}>Tools & Platforms</option>
+                    <option value="soft" ${item.category === 'soft' ? 'selected' : ''}>Soft Skills</option>
+                </select>
+            </div>
+        `;
+        
+        openModal('Edit Skill', modalContent);
+    }
+    
+    function deleteSkill(index) {
+        if (!confirm('Delete this skill?')) return;
+        appData.skills.splice(index, 1);
+        saveData();
+        renderSkillsList();
+    }
+    
+    function addEducation() {
+        const newEdu = {
+            id: Date.now(),
+            degree: document.getElementById('newEduDegree').value,
+            institution: document.getElementById('newEduInstitution').value,
+            startYear: document.getElementById('newEduStart').value,
+            endYear: document.getElementById('newEduEnd').value,
+            grade: document.getElementById('newEduGrade').value
+        };
+        
+        if (!newEdu.degree || !newEdu.institution) {
+            alert('Please fill in degree and institution');
+            return;
+        }
+        
+        if (!appData.education) appData.education = [];
+        appData.education.unshift(newEdu);
+        saveData();
+        renderEducationList();
+        
+        document.getElementById('newEduDegree').value = '';
+        document.getElementById('newEduInstitution').value = '';
+        document.getElementById('newEduStart').value = '';
+        document.getElementById('newEduEnd').value = '';
+        document.getElementById('newEduGrade').value = '';
+    }
+    
+    function editEducation(id) {
+        const item = appData.education.find(e => e.id === id);
+        if (!item) return;
+        
+        currentEditItem = item;
+        currentEditType = 'education';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Degree</label>
+                <input type="text" id="editDegree" value="${item.degree.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Institution</label>
+                <input type="text" id="editInstitution" value="${item.institution.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Start Year</label>
+                    <input type="text" id="editStart" value="${item.startYear}">
+                </div>
+                <div class="form-group">
+                    <label>End Year</label>
+                    <input type="text" id="editEnd" value="${item.endYear}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Grade/GPA</label>
+                <input type="text" id="editGrade" value="${item.grade || ''}">
+            </div>
+        `;
+        
+        openModal('Edit Education', modalContent);
+    }
+    
+    function deleteEducation(id) {
+        if (!confirm('Delete this education entry?')) return;
+        appData.education = (appData.education || []).filter(e => e.id !== id);
+        saveData();
+        renderEducationList();
+    }
+    
+    function addAward() {
+        const newAward = {
+            id: Date.now(),
+            name: document.getElementById('newAwardName').value,
+            organization: document.getElementById('newAwardOrg').value,
+            year: document.getElementById('newAwardYear').value,
+            description: document.getElementById('newAwardDesc').value
+        };
+        
+        if (!newAward.name || !newAward.organization) {
+            alert('Please fill in award name and organization');
+            return;
+        }
+        
+        if (!appData.awards) appData.awards = [];
+        appData.awards.unshift(newAward);
+        saveData();
+        renderAwardsList();
+        
+        document.getElementById('newAwardName').value = '';
+        document.getElementById('newAwardOrg').value = '';
+        document.getElementById('newAwardYear').value = '';
+        document.getElementById('newAwardDesc').value = '';
+    }
+    
+    function editAward(id) {
+        const item = appData.awards.find(a => a.id === id);
+        if (!item) return;
+        
+        currentEditItem = item;
+        currentEditType = 'award';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Award Name</label>
+                <input type="text" id="editName" value="${item.name.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Organization</label>
+                <input type="text" id="editOrg" value="${item.organization.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Year</label>
+                <input type="text" id="editYear" value="${item.year}">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="editDesc" value="${item.description || ''}">
+            </div>
+        `;
+        
+        openModal('Edit Award', modalContent);
+    }
+    
+    function deleteAward(id) {
+        if (!confirm('Delete this award?')) return;
+        appData.awards = (appData.awards || []).filter(a => a.id !== id);
+        saveData();
+        renderAwardsList();
+    }
+    
+    function addTestimonial() {
+        const newTest = {
+            id: Date.now(),
+            name: document.getElementById('newTestName').value,
+            position: document.getElementById('newTestPosition').value,
+            company: document.getElementById('newTestCompany').value,
+            text: document.getElementById('newTestText').value
+        };
+        
+        if (!newTest.name || !newTest.text) {
+            alert('Please fill in name and testimonial text');
+            return;
+        }
+        
+        if (!appData.testimonials) appData.testimonials = [];
+        appData.testimonials.unshift(newTest);
+        saveData();
+        renderTestimonialsList();
+        
+        document.getElementById('newTestName').value = '';
+        document.getElementById('newTestPosition').value = '';
+        document.getElementById('newTestCompany').value = '';
+        document.getElementById('newTestText').value = '';
+    }
+    
+    function editTestimonial(id) {
+        const item = appData.testimonials.find(t => t.id === id);
+        if (!item) return;
+        
+        currentEditItem = item;
+        currentEditType = 'testimonial';
+        
+        const modalContent = `
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="editName" value="${item.name.replace(/"/g, '&quot;')}">
+            </div>
+            <div class="form-group">
+                <label>Position</label>
+                <input type="text" id="editPosition" value="${item.position || ''}">
+            </div>
+            <div class="form-group">
+                <label>Company</label>
+                <input type="text" id="editCompany" value="${item.company || ''}">
+            </div>
+            <div class="form-group">
+                <label>Testimonial Text</label>
+                <textarea id="editText" rows="3">${item.text.replace(/"/g, '&quot;')}</textarea>
+            </div>
+        `;
+        
+        openModal('Edit Testimonial', modalContent);
+    }
+    
+    function deleteTestimonial(id) {
+        if (!confirm('Delete this testimonial?')) return;
+        appData.testimonials = (appData.testimonials || []).filter(t => t.id !== id);
+        saveData();
+        renderTestimonialsList();
+    }
+    
+    function saveEdit() {
+        if (!currentEditItem || !currentEditType) return;
+        
+        switch(currentEditType) {
+            case 'blog':
+                currentEditItem.title = document.getElementById('editTitle').value;
+                currentEditItem.excerpt = document.getElementById('editExcerpt').value;
+                currentEditItem.content = document.getElementById('editContent').value;
+                currentEditItem.category = document.getElementById('editCategory').value;
+                currentEditItem.tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
+                currentEditItem.published = document.getElementById('editPublished').checked;
+                break;
+                
+            case 'experience':
+                currentEditItem.title = document.getElementById('editTitle').value;
+                currentEditItem.company = document.getElementById('editCompany').value;
+                currentEditItem.location = document.getElementById('editLocation').value;
+                currentEditItem.startDate = document.getElementById('editStart').value;
+                currentEditItem.endDate = document.getElementById('editEnd').value;
+                currentEditItem.description = document.getElementById('editDesc').value;
+                currentEditItem.tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
+                currentEditItem.current = document.getElementById('editCurrent').checked;
+                break;
+                
+            case 'publication':
+                currentEditItem.title = document.getElementById('editTitle').value;
+                currentEditItem.authors = document.getElementById('editAuthors').value;
+                currentEditItem.journal = document.getElementById('editJournal').value;
+                currentEditItem.year = parseInt(document.getElementById('editYear').value);
+                currentEditItem.url = document.getElementById('editUrl').value;
+                currentEditItem.tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
+                break;
+                
+            case 'project':
+                currentEditItem.name = document.getElementById('editName').value;
+                currentEditItem.description = document.getElementById('editDesc').value;
+                currentEditItem.technologies = document.getElementById('editTech').value.split(',').map(t => t.trim()).filter(t => t);
+                currentEditItem.year = document.getElementById('editYear').value;
+                currentEditItem.url = document.getElementById('editUrl').value;
+                break;
+                
+            case 'certificate':
+                currentEditItem.title = document.getElementById('editTitle').value;
+                currentEditItem.issuer = document.getElementById('editIssuer').value;
+                currentEditItem.date = document.getElementById('editDate').value;
+                currentEditItem.grade = document.getElementById('editGrade').value;
+                currentEditItem.verifyId = document.getElementById('editVerify').value;
+                currentEditItem.type = document.getElementById('editType').value;
+                break;
+                
+            case 'skill':
+                appData.skills[currentEditItem.index].name = document.getElementById('editName').value;
+                appData.skills[currentEditItem.index].level = parseInt(document.getElementById('editLevel').value);
+                appData.skills[currentEditItem.index].category = document.getElementById('editCategory').value;
+                break;
+                
+            case 'education':
+                currentEditItem.degree = document.getElementById('editDegree').value;
+                currentEditItem.institution = document.getElementById('editInstitution').value;
+                currentEditItem.startYear = document.getElementById('editStart').value;
+                currentEditItem.endYear = document.getElementById('editEnd').value;
+                currentEditItem.grade = document.getElementById('editGrade').value;
+                break;
+                
+            case 'award':
+                currentEditItem.name = document.getElementById('editName').value;
+                currentEditItem.organization = document.getElementById('editOrg').value;
+                currentEditItem.year = document.getElementById('editYear').value;
+                currentEditItem.description = document.getElementById('editDesc').value;
+                break;
+                
+            case 'testimonial':
+                currentEditItem.name = document.getElementById('editName').value;
+                currentEditItem.position = document.getElementById('editPosition').value;
+                currentEditItem.company = document.getElementById('editCompany').value;
+                currentEditItem.text = document.getElementById('editText').value;
+                break;
+        }
+        
+        saveData();
+        closeModal();
+        
+        // Refresh lists
+        if (currentEditType === 'blog') { renderBlogList(); renderBlog(); }
+        if (currentEditType === 'experience') renderExperienceList();
+        if (currentEditType === 'publication') renderPublicationsList();
+        if (currentEditType === 'project') renderProjectsList();
+        if (currentEditType === 'certificate') renderCertificatesList();
+        if (currentEditType === 'skill') renderSkillsList();
+        if (currentEditType === 'education') renderEducationList();
+        if (currentEditType === 'award') renderAwardsList();
+        if (currentEditType === 'testimonial') renderTestimonialsList();
+    }
+    
+    // ==================== MODAL FUNCTIONS ====================
+    function openModal(title, content) {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalContent').innerHTML = content;
+        document.getElementById('editModal').classList.remove('hidden');
+        document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+    
+    function closeModal() {
+        document.getElementById('editModal').classList.add('hidden');
+        document.getElementById('modalOverlay').classList.add('hidden');
+        currentEditItem = null;
+        currentEditType = null;
+    }
+    
+    // ==================== POPULATE ADMIN FIELDS ====================
+    function populateAdminFields() {
+        // Profile
+        document.getElementById('inputName').value = appData.profile.name || '';
+        document.getElementById('inputTitle').value = appData.profile.title || '';
+        document.getElementById('inputStatus').value = appData.profile.status || '';
+        document.getElementById('inputBio').value = appData.profile.bio || '';
+        
+        if (appData.profile.image) {
+            document.getElementById('previewProfileImg').src = appData.profile.image;
+            document.getElementById('previewProfileImg').style.display = 'block';
+            document.getElementById('noProfileImg').style.display = 'none';
+        }
+        
+        // Contact
+        document.getElementById('inputEmail').value = appData.contact.email || '';
+        document.getElementById('inputPhone').value = appData.contact.phone || '';
+        document.getElementById('inputLocation').value = appData.contact.location || '';
+        document.getElementById('inputPassport').value = appData.contact.passport || '';
+        document.getElementById('inputLinkedIn').value = appData.contact.linkedin || '';
+        document.getElementById('inputScholar').value = appData.contact.scholar || '';
+        document.getElementById('inputGitHub').value = appData.contact.github || '';
+        document.getElementById('inputTwitter').value = appData.contact.twitter || '';
+        
+        // Stats
+        document.getElementById('inputStatPubs').value = appData.stats.publications || 0;
+        document.getElementById('inputStatCitations').value = appData.stats.citations || 0;
+        document.getElementById('inputStatHIndex').value = appData.stats.hIndex || 0;
+        document.getElementById('inputStatYears').value = appData.stats.years || 0;
+        document.getElementById('inputStatCountries').value = appData.stats.countries || 0;
+        document.getElementById('inputStatProjects').value = appData.stats.projects || 0;
+        
+        // Colors
+        document.getElementById('inputColorPrimary').value = appData.colors.primary || '#6366f1';
+        document.getElementById('inputColorSecondary').value = appData.colors.secondary || '#8b5cf6';
+        document.getElementById('inputColorBg').value = appData.colors.background || '#0a0a0a';
+        document.getElementById('inputColorText').value = appData.colors.text || '#ffffff';
+    }
+    
+    // ==================== DATA FUNCTIONS ====================
+    function exportData() {
+        const dataStr = JSON.stringify(appData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `portfolio-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    function importData() {
+        const fileInput = document.getElementById('importFile');
+        const file = fileInput.files[0];
+        if (!file) {
+            alert('Please select a file');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                appData = data;
+                saveData();
+                populateAdminFields();
+                showToast('Data imported successfully!');
+            } catch (err) {
+                alert('Invalid JSON file');
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    function resetAllData() {
+        if (!confirm('WARNING: This will erase ALL data. Continue?')) return;
+        localStorage.removeItem('portfolioData_v4');
+        location.reload();
+    }
+    
+    // ==================== UTILITY ====================
+    function filterCerts(type) {
+        renderCertificates(type);
+        document.querySelectorAll('.cert-filter').forEach(btn => {
+            btn.style.background = 'rgba(255,255,255,0.1)';
+        });
+        event.target.style.background = 'var(--accent)';
+    }
+    
+    function downloadCV() {
+        const text = `
+ABDULLAH AL FOYSAL - CV
+${new Date().toLocaleDateString()}
+
+CONTACT
+Email: ${appData.contact.email}
+Phone: ${appData.contact.phone}
+Location: ${appData.contact.location}
+
+PROFILE
+${appData.profile.bio}
+
+STATS
+- Publications: ${appData.stats.publications}+
+- Citations: ${appData.stats.citations}+
+- h-index: ${appData.stats.hIndex}
+- Projects: ${appData.stats.projects}+
+
+EXPERIENCE
+${appData.experience.map(e => `
+${e.title} | ${e.company}
+${e.location} | ${e.startDate} - ${e.endDate}
+${e.description}
+`).join('\n')}
+
+PUBLICATIONS
+${appData.publications.map(p => `- ${p.title} (${p.year})`).join('\n')}
+
+EDUCATION
+${(appData.education || []).map(e => `- ${e.degree}, ${e.institution} (${e.startYear}-${e.endYear})`).join('\n')}
+
+SKILLS
+${appData.skills.map(s => `- ${s.name}: ${s.level}%`).join('\n')}
+        `;
+        
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'CV_Abdullah_Al_Foysal.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    function sendEmail(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        btn.disabled = true;
+        
+        emailjs.sendForm('service_c94wba5', 'template_5ajn4l4', '#contactForm')
+            .then(() => {
+                alert('Message sent!');
+                e.target.reset();
+                showToast('Email sent successfully!');
+            }, (error) => {
+                console.error('Email error:', error);
+                alert('Failed to send. Please email directly: ' + appData.contact.email);
+            })
+            .finally(() => {
+                btn.innerHTML = original;
+                btn.disabled = false;
+            });
+    }
+
+    function scrollToSection(sectionId) {
+        const element = document.getElementById('section-' + sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function scrollToTop(e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
